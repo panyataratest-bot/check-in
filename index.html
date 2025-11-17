@@ -2,79 +2,172 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"/>
   <title>Check In Fin-ed</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{ --card-radius:1.5rem; --input-radius:.9rem; --input-padding-y:.9rem; --input-padding-x:1rem; --input-font-size:1.05rem; }
+    /* ===== Mobile-first tuning ===== */
+    :root{
+      --card-radius: 1.25rem;
+      --input-radius: .9rem;
+      --input-padding-y: .9rem;
+      --input-padding-x: 1rem;
+      --input-font-size: 1.05rem; /* >=16px ป้องกัน iOS ซูม */
+      --glass-bg: rgba(255,255,255,.07);
+      --glass-border: rgba(255,255,255,.12);
+      --glass-shadow: 0 6px 18px rgba(0,0,0,.25);
+    }
+    @media (max-width: 480px){
+      :root{
+        --card-radius: 1rem;
+        --input-padding-y: .85rem;
+        --input-padding-x: .95rem;
+      }
+    }
     body{ box-sizing:border-box; font-family:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif }
-    .glass{ background:rgba(255,255,255,.08); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,.12) }
-    .card{ border-radius:var(--card-radius) }
-    .input{ width:100%; background:rgba(255,255,255,.06); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.15); color:#fff;
-            padding:var(--input-padding-y) var(--input-padding-x); border-radius:var(--input-radius); font-size:var(--input-font-size) }
-    .input:focus{ background:rgba(255,255,255,.1); border-color:rgba(255,255,255,.3); box-shadow:0 0 0 3px rgba(255,255,255,.08); outline:none }
+    .glass{
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border:1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+    }
+    @media (max-width: 480px){
+      .glass{ backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+    }
+    .card{ border-radius: var(--card-radius) }
+    .input{
+      width:100%; background:rgba(255,255,255,.06);
+      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+      border:1px solid rgba(255,255,255,.15); color:#fff;
+      padding:var(--input-padding-y) var(--input-padding-x);
+      border-radius:var(--input-radius); font-size:var(--input-font-size);
+      min-height: 48px; /* tap target */
+    }
+    .input:focus{
+      background:rgba(255,255,255,.1);
+      border-color:rgba(255,255,255,.3);
+      box-shadow:0 0 0 3px rgba(255,255,255,.08); outline:none
+    }
     select.input option{ color:#111; background:#fff }
     .input[type="date"], .input[type="time"]{ -webkit-appearance:none; appearance:none; line-height:1.65 }
-    .input[type="date"]::-webkit-datetime-edit{ padding:.35rem .5rem }
-    .input[type="date"]::-webkit-datetime-edit-fields-wrapper{ padding:0 .25rem }
-    .input[type="date"]::-webkit-datetime-edit-text{ padding:0 .2rem }
-    .input[type="date"]::-webkit-calendar-picker-indicator, .input[type="time"]::-webkit-calendar-picker-indicator{ padding-right:.5rem; filter:invert(1) opacity(.85) }
-    .btn{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); transition:.2s; border-radius:var(--input-radius) }
+    .input[type="date"]::-webkit-calendar-picker-indicator,
+    .input[type="time"]::-webkit-calendar-picker-indicator{ padding-right:.5rem; filter:invert(1) opacity(.85) }
+
+    .btn{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); transition:.2s; border-radius:var(--input-radius); min-height:48px }
     .btn:hover{ background:rgba(255,255,255,.18); transform:translateY(-1px) }
     .btn-cta{ background:linear-gradient(135deg,#10b981,#16a34a); border:0; box-shadow:0 12px 24px rgba(16,185,129,.25) }
     .btn-cta:hover{ transform:translateY(-1.5px) scale(1.01); box-shadow:0 16px 30px rgba(16,185,129,.32) }
+
     .pill{ background:rgba(255,255,255,.1); border-radius:calc(var(--input-radius) + .4rem) }
     .chip{ background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18) }
-    .chip:hover{ background:rgba(255,255,255,.12) }
-    .mini-btn{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); border-radius:.7rem }
-    .mini-btn:hover{ background:rgba(255,255,255,.18) }
-
-    /* Tabs */
-    .tab-btn{ border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06) }
+    .mini-btn{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); border-radius:.7rem; min-height:40px }
+    .tab-btn{ border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.06); min-height:44px; white-space:nowrap }
     .tab-btn[aria-selected="true"]{ background:rgba(16,185,129,.18); border-color:rgba(16,185,129,.4) }
     .tab-panel{ display:none } .tab-panel.active{ display:block }
-
-    /* Equal button width with input */
     .btn-equal{ padding:var(--input-padding-y) var(--input-padding-x); border-radius:var(--input-radius) }
-
-    /* Schedule item layout */
     .row-card{ border-radius:1rem; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1) }
+    body.auth-locked { overflow: hidden; }
+    @keyframes shake {10%,90%{transform:translateX(-1px)}20%,80%{transform:translateX(2px)}30%,50%,70%{transform:translateX(-4px)}40%,60%{transform:translateX(4px)}}
+    .shake { animation: shake .35s linear both; }
+
+    /* Safe-area padding for notches / home indicators */
+    .safe-px{ padding-left: max(1rem, env(safe-area-inset-left)); padding-right:max(1rem, env(safe-area-inset-right)); }
+    .safe-pt{ padding-top:  max(1rem, env(safe-area-inset-top)); }
+    .safe-pb{ padding-bottom:max(1rem, env(safe-area-inset-bottom)); }
+
+    /* Tabs: horizontal scroll on small screens */
+    .tabs-scroll{ display:grid; grid-auto-flow:column; grid-auto-columns:max-content; overflow-x:auto; gap:.5rem; padding-bottom:.25rem; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch }
+    .tabs-scroll > * { scroll-snap-align:start }
+
+    /* Reduce motion if user prefers */
+    @media (prefers-reduced-motion: reduce){
+      *{ animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+    }
+
+    /* ===== Loader: Newton's Cradle (responsive) ===== */
+    .newtons-cradle {
+      --uib-size: clamp(36px, 7vw, 50px);
+      --uib-speed: 1.2s;
+      --uib-color: #cbd5e1;
+      position: relative; display:flex; align-items:center; justify-content:center;
+      width: var(--uib-size); height: var(--uib-size);
+    }
+    .newtons-cradle__dot { position:relative; display:flex; align-items:center; height:100%; width:25%; transform-origin:center top; }
+    .newtons-cradle__dot::after { content:''; display:block; width:100%; height:25%; border-radius:50%; background-color: var(--uib-color); }
+    .newtons-cradle__dot:first-child { animation: swing var(--uib-speed) linear infinite; }
+    .newtons-cradle__dot:last-child  { animation: swing2 var(--uib-speed) linear infinite; }
+    @keyframes swing {
+      0% { transform: rotate(0deg);   animation-timing-function:ease-out }
+      25%{ transform: rotate(70deg);  animation-timing-function:ease-in  }
+      50%{ transform: rotate(0deg);   animation-timing-function:linear   }
+    }
+    @keyframes swing2 {
+      0% { transform: rotate(0deg);   animation-timing-function:linear   }
+      50%{ transform: rotate(0deg);   animation-timing-function:ease-out }
+      75%{ transform: rotate(-70deg); animation-timing-function:ease-in  }
+    }
   </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-zinc-900 text-white">
-  <!-- background glow -->
-  <div class="fixed inset-0 pointer-events-none">
-    <div class="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl bg-white/10"></div>
-    <div class="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl bg-white/10"></div>
+<body class="min-h-screen bg-gradient-to-b from-slate-950 via-gray-900 to-zinc-900 text-white auth-locked">
+
+  <!-- AUTH GATE -->
+  <div id="authGate" class="fixed inset-0 z-[60] flex items-center justify-center safe-px safe-pt safe-pb">
+    <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+    <div id="authCard" class="relative glass card w-full max-w-sm p-5 sm:p-6">
+      <div class="text-center mb-4">
+        <div class="inline-flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-white/10 border border-white/20 mb-3">
+          <svg class="w-6 h-6 sm:w-7 sm:h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c1.657 0 3-1.567 3-3.5S13.657 4 12 4 9 5.567 9 7.5 10.343 11 12 11zM19 21a7 7 0 00-14 0h14z"/>
+          </svg>
+        </div>
+        <h2 class="text-lg sm:text-xl font-semibold">ใส่รหัสเพื่อเข้าใช้งาน</h2>
+        <p class="text-white/70 text-xs sm:text-sm mt-1">ระบบจะปลดล็อกเมื่อกรอกรหัสถูกต้อง</p>
+      </div>
+      <label class="block text-sm font-medium mb-2">รหัสผ่าน</label>
+      <div class="flex gap-2">
+        <input id="authInput" type="password" class="input flex-1" placeholder="ใส่รหัสผ่าน"/>
+        <button id="authToggle" type="button" class="btn px-3">แสดง</button>
+      </div>
+      <p id="authError" class="text-red-300 text-sm mt-2 hidden">รหัสผ่านไม่ถูกต้อง</p>
+      <button id="authBtn" type="button" class="btn btn-cta w-full py-3 font-semibold mt-4">เข้าสู่ระบบ</button>
+      <p class="text-xs text-white/60 mt-3">* จะจำสถานะปลดล็อกเฉพาะแท็บนี้จนกว่าจะปิดแท็บ</p>
+    </div>
   </div>
 
-  <div class="relative z-10 container mx-auto max-w-4xl px-6 py-10">
+  <!-- background glow (lighter on mobile) -->
+  <div class="fixed inset-0 pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-72 h-72 sm:w-80 sm:h-80 rounded-full blur-3xl bg-white/10"></div>
+    <div class="absolute -bottom-40 -left-40 w-72 h-72 sm:w-80 sm:h-80 rounded-full blur-3xl bg-white/10"></div>
+  </div>
+
+  <div class="relative z-10 mx-auto max-w-[720px] lg:max-w-4xl safe-px safe-pt safe-pb pt-6 sm:pt-10">
     <!-- header -->
-    <div class="text-center mb-8">
-      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/10 border border-white/20 mb-5">
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="text-center mb-6 sm:mb-8">
+      <div class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/10 border border-white/20 mb-4">
+        <svg class="w-7 h-7 sm:w-8 sm:h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
         </svg>
       </div>
-      <h1 class="text-3xl font-bold tracking-tight">Check In Fin-ed</h1>
+      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Check In Fin-ed</h1>
     </div>
 
-    <!-- Tabs -->
-    <div class="glass card p-2 mb-6">
-      <div role="tablist" class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-        <button id="tab-1" role="tab" class="tab-btn rounded-xl py-3 font-semibold" aria-selected="true">Check In</button>
-        <button id="tab-2" role="tab" class="tab-btn rounded-xl py-3 font-semibold" aria-selected="false">ตารางงานในอนาคต</button>
-        <button id="tab-3" role="tab" class="tab-btn rounded-xl py-3 font-semibold" aria-selected="false">ตั้งเวลา Check-in</button>
+    <!-- Tabs (horizontal scroll on mobile) -->
+    <div class="glass card p-2 mb-4 sm:mb-6">
+      <div role="tablist" class="tabs-scroll sm:grid sm:grid-cols-3 sm:gap-2">
+        <button id="tab-1" type="button" role="tab" class="tab-btn rounded-xl px-4 py-2 sm:py-3 font-semibold" aria-selected="true">Check In</button>
+        <button id="tab-2" type="button" role="tab" class="tab-btn rounded-xl px-4 py-2 sm:py-3 font-semibold" aria-selected="false">ตารางงานในอนาคต</button>
+        <button id="tab-3" type="button" role="tab" class="tab-btn rounded-xl px-4 py-2 sm:py-3 font-semibold" aria-selected="false">ตั้งเวลา Check-in</button>
       </div>
     </div>
 
-    <!-- ============== TAB 1: Check-in + Bulk ============== -->
+    <!-- ===== TAB 1: ฟอร์ม ===== -->
     <section id="panel-1" class="tab-panel active">
-      <div class="glass card p-6 mb-8">
-        <form id="checkinForm" class="space-y-6">
-          <div class="grid sm:grid-cols-2 gap-4">
+      <div class="glass card p-4 sm:p-6 mb-6 sm:mb-8">
+        <form id="checkinForm" class="space-y-5 sm:space-y-6">
+          <div class="grid sm:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label class="block text-sm font-semibold mb-2">ผู้ใช้งาน</label>
               <select id="nameSelect" class="input" required>
@@ -91,9 +184,9 @@
 
           <div>
             <label class="block text-sm font-semibold mb-2">ช่วงเวลา</label>
-            <div class="flex pill p-1">
-              <button type="button" id="fullBtn"  class="flex-1 py-2 rounded-xl bg-white/20 font-medium">เต็มวัน</button>
-              <button type="button" id="splitBtn" class="flex-1 py-2 rounded-xl text-white/90 font-medium">แยก AM/PM</button>
+            <div class="flex pill p-1 gap-1">
+              <button id="fullBtn"  type="button" class="flex-1 py-2 rounded-xl bg-white/20 font-medium">เต็มวัน</button>
+              <button id="splitBtn" type="button" class="flex-1 py-2 rounded-xl text-white/90 font-medium">แยก AM/PM</button>
             </div>
           </div>
 
@@ -114,7 +207,6 @@
             </div>
           </div>
 
-          <!-- Suggestions -->
           <div>
             <div class="flex items-center gap-2 mb-2">
               <span class="text-sm font-semibold">ตัวช่วยจากเพื่อนในวันที่เลือก</span>
@@ -124,72 +216,67 @@
             <p id="suggestEmpty" class="text-xs text-white/60 hidden">ยังไม่มีใครบันทึกในวันนี้</p>
           </div>
 
-          <button id="checkinBtn" class="btn btn-cta w-full py-3 font-semibold flex items-center justify-center gap-2">
+          <button id="checkinBtn" type="submit" class="btn btn-cta w-full py-3 font-semibold flex items-center justify-center gap-2">
             <span>Check In</span>
           </button>
         </form>
       </div>
 
       <!-- Bulk -->
-      <div class="glass card p-6 mb-8">
-        <h2 class="text-lg font-semibold mb-2">สร้างหลายวัน (โหมดขี้เกียจ)</h2>
+      <div class="glass card p-4 sm:p-6 mb-6 sm:mb-8">
+        <h2 class="text-base sm:text-lg font-semibold mb-2">สร้างหลายวัน (โหมดขี้เกียจ)</h2>
         <p class="text-white/70 text-sm mb-4">ใช้ข้อมูล “ผู้ใช้งาน” และ “ช่วงเวลา/สถานที่” จากฟอร์มด้านบน</p>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-          <button id="bulkThisWeek" class="btn px-4 py-3 font-semibold">สร้าง จ–ศ สัปดาห์นี้</button>
-          <button id="bulkNextWeek" class="btn px-4 py-3 font-semibold">สร้าง จ–ศ สัปดาห์หน้า</button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 mb-4">
+          <button id="bulkThisWeek" type="button" class="btn px-4 py-3 font-semibold">สร้าง จ–ศ สัปดาห์นี้</button>
+          <button id="bulkNextWeek" type="button" class="btn px-4 py-3 font-semibold">สร้าง จ–ศ สัปดาห์หน้า</button>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 items-end">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3 items-end">
           <div><label class="block text-sm font-semibold mb-2">เริ่มวันที่</label><input id="rangeStart" type="date" class="input"></div>
           <div><label class="block text-sm font-semibold mb-2">ถึงวันที่</label><input id="rangeEnd" type="date" class="input"></div>
         </div>
-        <div class="mt-3"><button id="bulkRange" class="btn px-5 py-3 font-semibold">บันทึกแบบช่วงวันที่</button></div>
+        <div class="mt-3"><button id="bulkRange" type="button" class="btn px-5 py-3 font-semibold w-full md:w-auto">บันทึกแบบช่วงวันที่</button></div>
         <p class="text-xs text-white/70 mt-3">* โหมด จ–ศ จะข้ามเสาร์–อาทิตย์อัตโนมัติ | โหมดช่วงวันที่จะบันทึกทุกวันในช่วงนั้น</p>
       </div>
     </section>
 
-    <!-- ============== TAB 2: Future schedule ============== -->
+    <!-- TAB 2 -->
     <section id="panel-2" class="tab-panel">
-      <div class="glass card p-6">
-        <h2 class="text-xl font-semibold mb-4">ตารางงานในอนาคต</h2>
-
+      <div class="glass card p-4 sm:p-6">
+        <h2 class="text-base sm:text-xl font-semibold mb-3 sm:mb-4">ตารางงานในอนาคต</h2>
         <div class="w-full max-w-md">
           <select id="viewName" class="input w-full mb-3">
             <option value="">เลือกชื่อผู้ใช้</option>
             <option>Tow</option><option>Kwan</option><option>Noi</option><option>Ray</option><option>Cap</option>
           </select>
-          <button id="viewBtn" class="btn btn-equal w-full font-semibold">ดูตาราง</button>
+          <button id="viewBtn" type="button" class="btn btn-equal w-full font-semibold">ดูตาราง</button>
         </div>
-
-        <div id="scheduleWrap" class="hidden mt-6">
+        <div id="scheduleWrap" class="hidden mt-5 sm:mt-6">
           <div id="scheduleList" class="space-y-3"></div>
         </div>
       </div>
     </section>
 
-    <!-- ============== TAB 3: Send to LINE ============== -->
+    <!-- TAB 3 -->
     <section id="panel-3" class="tab-panel">
-      <div class="glass card p-6">
-        <h2 class="text-xl font-semibold mb-4">ส่ง Check-in เข้าไลน์</h2>
-
-        <div class="grid lg:grid-cols-2 gap-6">
-          <!-- left -->
-          <div class="rounded-2xl p-5 bg-white/5 border border-white/10">
+      <div class="glass card p-4 sm:p-6">
+        <h2 class="text-base sm:text-xl font-semibold mb-3 sm:mb-4">ส่ง Check-in เข้าไลน์</h2>
+        <div class="grid lg:grid-cols-2 gap-4 sm:gap-6">
+          <div class="rounded-2xl p-4 sm:p-5 bg-white/5 border border-white/10">
             <h3 class="font-semibold mb-3">ส่งทันที</h3>
-            <div class="grid sm:grid-cols-2 gap-4">
+            <div class="grid sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <label class="block text-sm font-semibold mb-2">เลือกวันที่</label>
                 <input id="sendDateInput" type="date" class="input">
               </div>
               <div class="sm:pt-7">
-                <button id="sendNowBtn" class="btn w-full py-3 font-semibold">ห้ามกดเด็ดขาด</button>
+                <button id="sendNowBtn" type="button" class="btn w-full py-3 font-semibold">ห้ามกดเด็ดขาด</button>
               </div>
             </div>
           </div>
 
-          <!-- right -->
-          <div class="rounded-2xl p-5 bg-white/5 border border-white/10">
+          <div class="rounded-2xl p-4 sm:p-5 bg-white/5 border border-white/10">
             <h3 class="font-semibold mb-3">ตั้งเวลาส่งอัตโนมัติ</h3>
-            <div class="grid sm:grid-cols-3 gap-3 items-end mb-4">
+            <div class="grid sm:grid-cols-3 gap-2 sm:gap-3 items-end mb-4">
               <label class="flex items-center gap-2 sm:col-span-1">
                 <input type="checkbox" id="schedEnabled" class="accent-emerald-400">
                 <span>เปิดใช้งาน</span>
@@ -211,276 +298,583 @@
             </label>
 
             <div class="flex flex-col sm:flex-row gap-3">
-              <button id="saveSchedBtn" class="btn flex-1 py-3 font-semibold">บันทึกตารางส่ง</button>
-              <button id="reloadSchedBtn" class="btn sm:w-32 py-3 font-semibold">รีเฟรช</button>
+              <button id="saveSchedBtn" type="button" class="btn flex-1 py-3 font-semibold">บันทึกตารางส่ง</button>
+              <button id="reloadSchedBtn" type="button" class="btn sm:w-32 py-3 font-semibold">รีเฟรช</button>
             </div>
 
             <div id="schedStatus" class="text-xs text-white/70 mt-3"></div>
           </div>
         </div>
+
+        <!-- สร้างข้อความเช็คอิน -->
+        <div class="mt-5 sm:mt-6 rounded-2xl p-4 sm:p-5 bg-white/5 border border-white/10">
+          <h3 class="font-semibold mb-3">สร้างข้อความเช็คอิน (สำหรับคัดลอกไปส่งเอง)</h3>
+          <div class="grid sm:grid-cols-3 gap-3 sm:gap-4 items-end">
+            <div class="sm:col-span-1">
+              <label class="block text-sm font-semibold mb-2">เลือกวันที่</label>
+              <input id="previewDate" type="date" class="input">
+            </div>
+            <div class="sm:col-span-2 flex gap-2">
+              <button id="buildPreviewBtn" type="button" class="btn flex-1 py-3 font-semibold">สร้างข้อความเช็คอิน</button>
+              <button id="copyPreviewBtn" type="button" class="btn sm:w-40 py-3 font-semibold">คัดลอก</button>
+            </div>
+          </div>
+
+          <!-- Loader -->
+          <div id="previewLoader" class="mt-4 hidden flex items-center justify-center">
+            <div class="newtons-cradle">
+              <div class="newtons-cradle__dot"></div>
+              <div class="newtons-cradle__dot"></div>
+              <div class="newtons-cradle__dot"></div>
+              <div class="newtons-cradle__dot"></div>
+            </div>
+          </div>
+
+          <div class="mt-3">
+            <textarea id="previewBox" class="input !bg-black/30 !border-white/20 font-mono text-[0.95rem] h-44" readonly placeholder="กด “สร้างข้อความเช็คอิน” เพื่อแสดงข้อความที่นี่"></textarea>
+          </div>
+          <p id="previewHint" class="text-xs text-white/60 mt-2"></p>
+        </div>
       </div>
     </section>
 
     <!-- status & popup -->
-    <div id="status" class="hidden mt-6 p-4 rounded-2xl"></div>
-    <div id="popup" class="hidden fixed inset-0 z-50 items-center justify-center p-6">
+    <div id="status" class="hidden mt-5 sm:mt-6 p-4 rounded-2xl"></div>
+    <div id="popup" class="hidden fixed inset-0 z-50 items-center justify-center p-4 sm:p-6">
       <div class="absolute inset-0 bg-black/50"></div>
-      <div class="relative glass card p-6 max-w-sm w-full text-center">
-        <div class="w-14 h-14 rounded-2xl bg-green-500/20 mx-auto mb-4 flex items-center justify-center">
-          <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="relative glass card p-5 sm:p-6 max-w-sm w-full text-center">
+        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-green-500/20 mx-auto mb-3 sm:mb-4 flex items-center justify-center">
+          <svg class="w-7 h-7 sm:w-8 sm:h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
         </div>
-        <h3 class="text-xl font-semibold mb-2">สำเร็จ</h3>
+        <h3 class="text-lg sm:text-xl font-semibold mb-2">สำเร็จ</h3>
         <p id="popupMsg" class="text-white/90 mb-4"></p>
-        <button onclick="closePopup()" class="btn w-full py-2 font-semibold">ตกลง</button>
+        <button id="popupOk" type="button" class="btn w-full py-2 font-semibold">ตกลง</button>
       </div>
     </div>
   </div>
 
   <script>
-    /* ================= CONFIG ================= */
-    const APP_SCRIPT_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxKmlulJgGnv8pUqbbOYlK5mRn6jZ_DdQQCKoJ3dExHWl62mDOPhDR5usWbSpC38gzH/exec';
+  (function(){
+    /* ===== SAFE HELPERS (ES5) ===== */
+    function byId(id){ return document.getElementById(id); }
+    function text(el, t){ if(el) el.textContent = t; }
+    function show(el){ if(el){ el.classList.remove('hidden'); } }
+    function hide(el){ if(el){ el.classList.add('hidden'); } }
+    function addClass(el, c){ if(el){ el.classList.add(c); } }
+    function removeClass(el, c){ if(el){ el.classList.remove(c); } }
 
-    /* ===== Date helpers (local) ===== */
-    const toLocalISO = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    function getWeekRange(offset=0){
-      const now=new Date(); now.setHours(0,0,0,0);
-      const diffToMon=(now.getDay()===0?-6:1-now.getDay())+offset*7;
-      const mon=new Date(now); mon.setDate(now.getDate()+diffToMon);
-      const fri=new Date(mon); fri.setDate(mon.getDate()+4);
-      return { start:toLocalISO(mon), end:toLocalISO(fri) };
+    /* ===== AUTH ===== */
+    var PASSWORD = '1150';
+    var AUTH_KEY = 'auth_ok';
+
+    function unlockApp(silent){
+      document.body.classList.remove('auth-locked');
+      var gate = byId('authGate');
+      if(gate && gate.parentNode){ gate.parentNode.removeChild(gate); }
+      try{ sessionStorage.setItem(AUTH_KEY,'1'); }catch(e){}
+      if(!silent){
+        var h1 = document.querySelector('h1');
+        if(h1 && h1.scrollIntoView){ h1.scrollIntoView({behavior:'smooth', block:'start'}); }
+      }
     }
+    function shakeCard(){
+      var card = byId('authCard');
+      var err = byId('authError');
+      if(err) err.classList.remove('hidden');
+      if(!card) return;
+      card.classList.remove('shake'); void card.offsetWidth; card.classList.add('shake');
+    }
+    function tryAuth(){
+      var input = byId('authInput');
+      var v = (input && input.value) ? input.value.replace(/^\s+|\s+$/g,'') : '';
+      if(v === PASSWORD){
+        if(byId('authError')) addClass(byId('authError'),'hidden');
+        unlockApp(false);
+      }else{
+        shakeCard();
+      }
+    }
+    var btnLogin = byId('authBtn'); if(btnLogin){ btnLogin.addEventListener('click', tryAuth); }
+    var inputPwd = byId('authInput');
+    if(inputPwd){
+      inputPwd.addEventListener('keydown', function(e){ if(e && e.key === 'Enter'){ e.preventDefault(); tryAuth(); } });
+    }
+    var btnToggle = byId('authToggle');
+    if(btnToggle){
+      btnToggle.addEventListener('click', function(){
+        var i = byId('authInput'); if(!i) return;
+        i.type = (i.type === 'password') ? 'text' : 'password';
+        text(byId('authToggle'), i.type === 'password' ? 'แสดง' : 'ซ่อน');
+        try{ i.focus(); i.selectionStart = i.value.length; i.selectionEnd = i.value.length; }catch(e){}
+      });
+    }
+    try{
+      if(sessionStorage.getItem('auth_ok') === '1'){ unlockApp(true); }
+      else{ setTimeout(function(){ var el = byId('authInput'); if(el) el.focus(); }, 30); }
+    }catch(e){}
+
+    /* ===== POPUP ===== */
+    function openPopup(msg){ text(byId('popupMsg'), msg || ''); var p = byId('popup'); if(!p) return; p.classList.remove('hidden'); p.classList.add('flex'); }
+    function closePopup(){ var p = byId('popup'); if(!p) return; p.classList.add('hidden'); p.classList.remove('flex'); }
+    var popupOk = byId('popupOk'); if(popupOk){ popupOk.addEventListener('click', closePopup); }
+
+    /* ===== CONFIG & UTILS ===== */
+    var APP_SCRIPT_WEBAPP_URL='https://script.google.com/macros/s/AKfycbxKmlulJgGnv8pUqbbOYlK5mRn6jZ_DdQQCKoJ3dExHWl62mDOPhDR5usWbSpC38gzH/exec';
+    function toLocalISO(d){ var y=d.getFullYear(), m=('0'+(d.getMonth()+1)).slice(-2), da=('0'+d.getDate()).slice(-2); return y+'-'+m+'-'+da; }
+    function getWeekRange(offset){ offset = offset||0; var now=new Date(); now.setHours(0,0,0,0); var diffToMon=(now.getDay()===0?-6:1-now.getDay())+offset*7; var mon=new Date(now); mon.setDate(now.getDate()+diffToMon); var fri=new Date(mon); fri.setDate(mon.getDate()+4); return {start:toLocalISO(mon), end:toLocalISO(fri)}; }
+    function toast(msg,type){ type = type||'info'; var el=byId('status'); if(!el) return; el.className='mt-6 p-4 rounded-2xl '+(type==='error'?'bg-red-500/20 border border-red-500/40':'bg-white/10 border border-white/20'); el.textContent=msg||''; el.classList.remove('hidden'); setTimeout(function(){ el.classList.add('hidden'); },4500); }
+    function setBtnLoading(btn,loading,done,label){ if(!btn) return; done = done||'เสร็จ'; label = label||'กำลังทำงาน...'; if(loading){ btn.disabled=true; btn.setAttribute('data-prev', btn.innerHTML); btn.innerHTML='<span class="inline-flex items-center gap-2"><svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>'+label+'</span>'; } else { btn.disabled=false; btn.innerHTML=btn.getAttribute('data-prev')||done; } }
 
     /* ===== Tabs ===== */
-    const tabs=[{btn:'tab-1',panel:'panel-1'},{btn:'tab-2',panel:'panel-2'},{btn:'tab-3',panel:'panel-3'}];
-    function activateTab(i){ tabs.forEach((t,idx)=>{document.getElementById(t.btn).setAttribute('aria-selected',i===idx?'true':'false');document.getElementById(t.panel).classList.toggle('active',i===idx)});localStorage.setItem('activeTab',String(i)); }
-    tabs.forEach((t,i)=>document.getElementById(t.btn).addEventListener('click',()=>activateTab(i)));
-    const saved = Number(localStorage.getItem('activeTab')); if(!Number.isNaN(saved)) activateTab(saved);
+    var tabs=[{btn:'tab-1',panel:'panel-1'},{btn:'tab-2',panel:'panel-2'},{btn:'tab-3',panel:'panel-3'}];
+    function activateTab(i){
+      for(var k=0;k<tabs.length;k++){
+        var t=tabs[k]; var b=byId(t.btn), p=byId(t.panel);
+        if(b) b.setAttribute('aria-selected', i===k?'true':'false');
+        if(p){ if(i===k) addClass(p,'active'); else removeClass(p,'active'); }
+      }
+      try{ localStorage.setItem('activeTab', String(i)); }catch(e){}
+    }
+    for(var iTab=0;iTab<tabs.length;iTab++){
+      (function(idx){ var b=byId(tabs[idx].btn); if(b) b.addEventListener('click', function(){ activateTab(idx); }); })(iTab);
+    }
+    try{ var savedTab = Number(localStorage.getItem('activeTab')); if(!isNaN(savedTab)) activateTab(savedTab); }catch(e){}
 
-    /* ===== UI basics ===== */
-    const today = toLocalISO(new Date());
-    const dateInput=document.getElementById('dateInput'); dateInput.min=today; dateInput.value=today;
-    document.getElementById('rangeStart').min=today; document.getElementById('rangeEnd').min=today;
-    const sendDateInput=document.getElementById('sendDateInput'); sendDateInput.min=today; sendDateInput.value=today;
+    /* ===== UI init ===== */
+    var today = toLocalISO(new Date());
+    var dateInput = byId('dateInput'); if(dateInput){ dateInput.min=today; dateInput.value=today; }
+    var rs=byId('rangeStart'), re=byId('rangeEnd'); if(rs){ rs.min=today; } if(re){ re.min=today; }
+    var sendDateInput = byId('sendDateInput'); if(sendDateInput){ sendDateInput.min=today; sendDateInput.value=today; }
 
-    function toast(msg,type='info'){ const el=document.getElementById('status'); el.className=`mt-6 p-4 rounded-2xl ${type==='error'?'bg-red-500/20 border border-red-500/40':'bg-white/10 border border-white/20'}`; el.textContent=msg; el.classList.remove('hidden'); setTimeout(()=>el.classList.add('hidden'),4500); }
-    function openPopup(text){ document.getElementById('popupMsg').textContent=text; const p=document.getElementById('popup'); p.classList.remove('hidden'); p.classList.add('flex'); }
-    function closePopup(){ const p=document.getElementById('popup'); p.classList.add('hidden'); p.classList.remove('flex'); }
-    function setBtnLoading(btn,loading,done='เสร็จ',label='กำลังทำงาน...'){ if(loading){ btn.disabled=true; btn.dataset.prev=btn.innerHTML; btn.innerHTML=`<span class="inline-flex items-center gap-2"><svg class="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>${label}</span>` } else { btn.disabled=false; btn.innerHTML=btn.dataset.prev||done } }
-
-    /* ===== Toggle AM/PM ===== */
-    let splitMode=false;
-    const fullBtn=document.getElementById('fullBtn'), splitBtn=document.getElementById('splitBtn');
-    const fullBox=document.getElementById('fullBox'), splitBox=document.getElementById('splitBox');
-    fullBtn.addEventListener('click',()=>{ splitMode=false; fullBtn.classList.add('bg-white/20'); splitBtn.classList.remove('bg-white/20'); fullBox.classList.remove('hidden'); splitBox.classList.add('hidden'); });
-    splitBtn.addEventListener('click',()=>{ splitMode=true;  splitBtn.classList.add('bg-white/20'); fullBtn.classList.remove('bg-white/20'); splitBox.classList.remove('hidden'); fullBox.classList.add('hidden'); });
+    /* ===== Toggle AM/PM (Tab1) ===== */
+    var splitMode=false;
+    var fullBtn=byId('fullBtn'), splitBtn=byId('splitBtn');
+    var fullBox=byId('fullBox'),  splitBox=byId('splitBox');
+    if(fullBtn) fullBtn.addEventListener('click', function(){ splitMode=false; if(fullBtn) addClass(fullBtn,'bg-white/20'); if(splitBtn) removeClass(splitBtn,'bg-white/20'); show(fullBox); hide(splitBox); });
+    if(splitBtn) splitBtn.addEventListener('click', function(){ splitMode=true;  if(splitBtn) addClass(splitBtn,'bg-white/20'); if(fullBtn) removeClass(fullBtn,'bg-white/20'); show(splitBox); hide(fullBox); });
 
     /* ===== API helper ===== */
-    async function callAPI(action,payload={}){ const fd=new FormData(); fd.append('action',action); fd.append('payload',JSON.stringify(payload)); const res=await fetch(APP_SCRIPT_WEBAPP_URL,{method:'POST',body:fd}); const t=await res.text(); try{ return JSON.parse(t) }catch{ return {ok:false,error:'Invalid JSON',raw:t} } }
-
-    /* ===== Suggestions ===== */
-    const suggestWrap=document.getElementById('suggestWrap'), suggestEmpty=document.getElementById('suggestEmpty'), suggestLoading=document.getElementById('suggestLoading');
-    async function refreshSuggestions(){ const date=document.getElementById('dateInput').value; const name=document.getElementById('nameSelect').value.trim(); if(!date) return;
-      suggestWrap.innerHTML=''; suggestEmpty.classList.add('hidden'); suggestLoading.classList.remove('hidden');
-      try{ const {ok,items,error}=await callAPI('suggest',{date,excludeName:name||''}); suggestLoading.classList.add('hidden'); if(!ok){ suggestWrap.innerHTML=`<div class="text-red-300 text-sm">${error||'โหลดคำแนะนำไม่สำเร็จ'}</div>`; return } if(!items?.length){ suggestEmpty.classList.remove('hidden'); return } suggestWrap.innerHTML=items.map(renderSuggestItem).join('') }
-      catch(_){ suggestLoading.classList.add('hidden'); suggestWrap.innerHTML=`<div class="text-white/80 text-sm">เกิดข้อผิดพลาดในการเชื่อมต่อ</div>` }
+    function callAPI(action,payload,cb){
+      var fd=new FormData(); fd.append('action', action);
+      try{ fd.append('payload', JSON.stringify(payload||{})); }catch(e){ fd.append('payload','{}'); }
+      fetch(APP_SCRIPT_WEBAPP_URL,{method:'POST',body:fd})
+        .then(function(res){ return res.text(); })
+        .then(function(t){ var r; try{ r=JSON.parse(t); }catch(e){ r={ok:false,error:'Invalid JSON',raw:t}; } cb(r); })
+        .catch(function(){ cb({ok:false,error:'NETWORK'}); });
     }
-    function renderSuggestItem(it){ const [loc,part]=parsePart(it.location); const names=(it.names||[]).join(' '); return `
-      <div class="chip rounded-xl p-3">
-        <div class="flex items-center justify-between gap-3">
-          <div>
-            <div class="font-medium">${loc} ${part?`<span class="text-xs text-white/70">${part}</span>`:''}</div>
-            <div class="text-xs text-white/70">เพื่อน (${it.count}): ${names}</div>
-          </div>
-          <div class="flex gap-2">
-            <button class="mini-btn text-xs px-2 py-1" onclick="useSuggest('${escapeHTML(loc)}','both')">ทั้งวัน</button>
-            <button class="mini-btn text-xs px-2 py-1" onclick="useSuggest('${escapeHTML(loc)}','am')">AM</button>
-            <button class="mini-btn text-xs px-2 py-1" onclick="useSuggest('${escapeHTML(loc)}','pm')">PM</button>
-          </div>
-        </div>
-      </div>`}
-    function parsePart(s){ const m=/(.*)\s+\((AM|PM)\)$/i.exec(s||''); return m?[m[1].trim(),`(${m[2].toUpperCase()})`]:[s,''] }
-    window.useSuggest=function(loc,mode){ if(mode==='both'){ if(!splitMode) document.getElementById('fullLocation').value=loc; else { document.getElementById('amLocation').value=loc; document.getElementById('pmLocation').value=loc; } } else if(mode==='am'){ splitMode=true; splitBtn.click(); document.getElementById('amLocation').value=loc; } else { splitMode=true; splitBtn.click(); document.getElementById('pmLocation').value=loc; } toast(`ใส่สถานที่: ${loc} (${mode==='both'?'ทั้งวัน':mode.toUpperCase()})`) }
-    document.getElementById('dateInput').addEventListener('change',refreshSuggestions);
-    document.getElementById('nameSelect').addEventListener('change',refreshSuggestions); refreshSuggestions();
+
+    /* ===== Suggestions (Tab1) ===== */
+    var suggestWrap=byId('suggestWrap'), suggestEmpty=byId('suggestEmpty'), suggestLoading=byId('suggestLoading');
+    function parsePart(s){ s=s||''; var m=/(.*)\s+\((AM|PM)\)$/i.exec(s); return m ? [m[1].replace(/\s+$/,''), '('+m[2].toUpperCase()+')'] : [s,'']; }
+    function escapeHTML(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+    function renderSuggestItem(it){
+      var p = parsePart(it.location||''); var loc=p[0], part=p[1]; var names=(it.names||[]).join(' ');
+      var partSpan = part ? '<span class="text-xs text-white/70">'+part+'</span>' : '';
+      return '<div class="chip rounded-xl p-3"><div class="flex items-center justify-between gap-3"><div><div class="font-medium">'+loc+' '+partSpan+'</div><div class="text-xs text-white/70">เพื่อน ('+(it.count||0)+'): '+names+'</div></div><div class="flex gap-2"><button type="button" class="mini-btn text-xs px-2 py-1" data-action="sugg" data-mode="both" data-loc="'+escapeHTML(loc)+'">ทั้งวัน</button><button type="button" class="mini-btn text-xs px-2 py-1" data-action="sugg" data-mode="am" data-loc="'+escapeHTML(loc)+'">AM</button><button type="button" class="mini-btn text-xs px-2 py-1" data-action="sugg" data-mode="pm" data-loc="'+escapeHTML(loc)+'">PM</button></div></div></div>';
+    }
+    function refreshSuggestions(){
+      var dEl = byId('dateInput'); var nEl = byId('nameSelect');
+      var date = dEl ? dEl.value : ''; var name = nEl ? (nEl.value||'').replace(/^\s+|\s+$/g,'') : '';
+      if(!date) return;
+      if(suggestWrap) suggestWrap.innerHTML='';
+      if(suggestEmpty) addClass(suggestEmpty,'hidden');
+      if(suggestLoading) removeClass(suggestLoading,'hidden');
+      callAPI('suggest', {date:date, excludeName:name||''}, function(res){
+        if(suggestLoading) addClass(suggestLoading,'hidden');
+        if(!res.ok){ if(suggestWrap) suggestWrap.innerHTML='<div class="text-red-300 text-sm">'+(res.error||'โหลดคำแนะนำไม่สำเร็จ')+'</div>'; return; }
+        var items = res.items||[];
+        if(!items.length){ if(suggestEmpty) removeClass(suggestEmpty,'hidden'); return; }
+        var html=''; for(var i=0;i<items.length;i++){ html+=renderSuggestItem(items[i]); }
+        if(suggestWrap) suggestWrap.innerHTML=html;
+      });
+    }
+    if(byId('dateInput')) byId('dateInput').addEventListener('change', refreshSuggestions);
+    if(byId('nameSelect')) byId('nameSelect').addEventListener('change', refreshSuggestions);
+    refreshSuggestions();
+
+    if(suggestWrap){
+      suggestWrap.addEventListener('click', function(ev){
+        var btn = ev.target.closest ? ev.target.closest('[data-action="sugg"]') : null;
+        if(!btn) return;
+        var loc = btn.getAttribute('data-loc')||'';
+        var mode = btn.getAttribute('data-mode')||'both';
+        if(mode==='both'){
+          if(!splitMode){ var fl=byId('fullLocation'); if(fl) fl.value=loc; }
+          else { var am=byId('amLocation'), pm=byId('pmLocation'); if(am) am.value=loc; if(pm) pm.value=loc; }
+        }else if(mode==='am'){
+          splitMode=true; if(splitBtn) splitBtn.click(); var am2=byId('amLocation'); if(am2) am2.value=loc;
+        }else{
+          splitMode=true; if(splitBtn) splitBtn.click(); var pm2=byId('pmLocation'); if(pm2) pm2.value=loc;
+        }
+        toast('ใส่สถานที่: '+loc+' ('+(mode==='both'?'ทั้งวัน':mode.toUpperCase())+')');
+      });
+    }
 
     /* ===== Submit single day ===== */
-    const checkinBtn=document.getElementById('checkinBtn');
-    document.getElementById('checkinForm').addEventListener('submit',async e=>{
+    var checkinBtn = byId('checkinBtn');
+    if(byId('checkinForm')) byId('checkinForm').addEventListener('submit', function(e){
       e.preventDefault();
-      const name=document.getElementById('nameSelect').value.trim();
-      const date=document.getElementById('dateInput').value;
+      var name=(byId('nameSelect').value||'').replace(/^\s+|\s+$/g,'');
+      var date=byId('dateInput').value;
       if(!name||!date) return toast('กรุณากรอกข้อมูลให้ครบถ้วน','error');
       if(date<today)    return toast('ไม่อนุญาตให้บันทึกย้อนหลัง','error');
 
-      let payload;
+      var payload;
       if(!splitMode){
-        const loc=document.getElementById('fullLocation').value.trim();
+        var loc=(byId('fullLocation').value||'').replace(/^\s+|\s+$/g,'');
         if(!loc) return toast('กรุณากรอกสถานที่ (เต็มวัน)','error');
-        payload={name,date,split:false,location:loc};
+        payload={name:name, date:date, split:false, location:loc};
       }else{
-        const am=document.getElementById('amLocation').value.trim(), pm=document.getElementById('pmLocation').value.trim();
+        var am=(byId('amLocation').value||'').replace(/^\s+|\s+$/g,'');
+        var pm=(byId('pmLocation').value||'').replace(/^\s+|\s+$/g,'');
         if(!am||!pm) return toast('กรุณากรอกสถานที่ทั้ง AM และ PM','error');
-        payload={name,date,split:true,amLoc:am,pmLoc:pm};
+        payload={name:name, date:date, split:true, amLoc:am, pmLoc:pm};
       }
 
-      try{ setBtnLoading(checkinBtn,true,'Check In','กำลังบันทึก...'); const {ok,upsert,error}=await callAPI('create',payload);
-           if(!ok) return toast(error||'บันทึกไม่สำเร็จ','error');
-           openPopup(upsert?'อัปเดตข้อมูลของวันนี้เรียบร้อย':'บันทึกเรียบร้อย'); refreshSuggestions(); }
-      finally{ setBtnLoading(checkinBtn,false,'Check In') }
+      setBtnLoading(checkinBtn,true,'Check In','กำลังบันทึก...');
+      callAPI('create', payload, function(r){
+        setBtnLoading(checkinBtn,false,'Check In');
+        if(!r.ok) return toast(r.error||'บันทึกไม่สำเร็จ','error');
+        openPopup(r.upsert ? 'อัปเดตข้อมูลของวันนี้เรียบร้อย' : 'บันทึกเรียบร้อย');
+        refreshSuggestions();
+      });
     });
 
     /* ===== Bulk ===== */
-    function commonBulk(){ const name=document.getElementById('nameSelect').value.trim(); if(!name){ toast('กรุณาเลือกผู้ใช้งานก่อน','error'); return null }
-      if(!splitMode){ const loc=document.getElementById('fullLocation').value.trim(); if(!loc){ toast('กรุณากรอกสถานที่ (เต็มวัน)','error'); return null } return {name,split:false,location:loc} }
-      const am=document.getElementById('amLocation').value.trim(), pm=document.getElementById('pmLocation').value.trim(); if(!am||!pm){ toast('กรุณากรอกสถานที่ทั้ง AM และ PM','error'); return null } return {name,split:true,amLoc:am,pmLoc:pm} }
-    const bulkThisWeekBtn=document.getElementById('bulkThisWeek'), bulkNextWeekBtn=document.getElementById('bulkNextWeek'), bulkRangeBtn=document.getElementById('bulkRange');
-
-    bulkThisWeekBtn.addEventListener('click',async()=>{ const base=commonBulk(); if(!base) return; const {start,end}=getWeekRange(0); const payload={...base,startDate:start,endDate:end,weekdaysOnly:true};
-      try{ setBtnLoading(bulkThisWeekBtn,true,'สร้าง จ–ศ สัปดาห์นี้','กำลังสร้าง...'); const r=await callAPI('bulkCreate',payload); if(!r.ok) return toast(r.error||'บันทึกไม่สำเร็จ','error'); openPopup(`สร้างสำเร็จ: เพิ่ม ${r.created} · อัปเดต ${r.updated}${r.skippedPast?` · ข้ามย้อนหลัง ${r.skippedPast}`:''}`) }
-      finally{ setBtnLoading(bulkThisWeekBtn,false,'สร้าง จ–ศ สัปดาห์นี้') } });
-
-    bulkNextWeekBtn.addEventListener('click',async()=>{ const base=commonBulk(); if(!base) return; const {start,end}=getWeekRange(1); const payload={...base,startDate:start,endDate:end,weekdaysOnly:true};
-      try{ setBtnLoading(bulkNextWeekBtn,true,'สร้าง จ–ศ สัปดาห์หน้า','กำลังสร้าง...'); const r=await callAPI('bulkCreate',payload); if(!r.ok) return toast(r.error||'บันทึกไม่สำเร็จ','error'); openPopup(`สร้างสำเร็จ: เพิ่ม ${r.created} · อัปเดต ${r.updated}`) }
-      finally{ setBtnLoading(bulkNextWeekBtn,false,'สร้าง จ–ศ สัปดาห์หน้า') } });
-
-    bulkRangeBtn.addEventListener('click',async()=>{ const base=commonBulk(); if(!base) return; const s=document.getElementById('rangeStart').value, e=document.getElementById('rangeEnd').value;
-      if(!s||!e) return toast('กรุณาเลือกช่วงวันที่ให้ครบ','error'); if(e<s) return toast('วันสิ้นสุดต้องมากกว่าหรือเท่ากับวันเริ่ม','error');
-      try{ setBtnLoading(bulkRangeBtn,true,'บันทึกแบบช่วงวันที่','กำลังสร้าง...'); const r=await callAPI('bulkCreate',{...base,startDate:s,endDate:e,weekdaysOnly:false}); if(!r.ok) return toast(r.error||'บันทึกไม่สำเร็จ','error'); openPopup(`สร้างสำเร็จ: เพิ่ม ${r.created} · อัปเดต ${r.updated}`) }
-      finally{ setBtnLoading(bulkRangeBtn,false,'บันทึกแบบช่วงวันที่') } });
-
-    /* ===== Future schedule ===== */
-    const viewBtn=document.getElementById('viewBtn');
-    viewBtn.addEventListener('click',async()=>{ const name=document.getElementById('viewName').value.trim(); if(!name) return toast('กรุณาเลือกชื่อผู้ใช้','error'); setBtnLoading(viewBtn,true,'ดูตาราง','กำลังโหลด...'); try{ await renderSchedule(name) } finally{ setBtnLoading(viewBtn,false,'ดูตาราง') } });
-
-    async function renderSchedule(name){
-      const wrap=document.getElementById('scheduleWrap'), list=document.getElementById('scheduleList');
-      wrap.classList.remove('hidden'); list.innerHTML=`<div class="text-white/80">กำลังโหลด...</div>`;
-      try{ const {ok,items,error}=await callAPI('listFuture',{name,from:today}); if(!ok) return list.innerHTML=`<div class="text-red-300">${error||'โหลดไม่สำเร็จ'}</div>`;
-           if(!items?.length) return list.innerHTML=`<div class="text-white/80">ไม่มีตารางงานในอนาคต</div>`;
-           list.innerHTML=items.map(renderItem).join(''); }
-      catch(_){ list.innerHTML=`<div class="text-white/80">เกิดข้อผิดพลาดในการเชื่อมต่อ</div>`; }
-    }
-    function formatThai(iso){ const d=new Date(iso); const m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.']; return `${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()+543}` }
-    function escapeHTML(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;') }
-    function renderItem(e){
-      const detail = e.split
-        ? `<div class="text-sm text-white/90">🌅 AM: ${e.am||'-'}</div><div class="text-sm text-white/90">🌆 PM: ${e.pm||'-'}</div>`
-        : `<div class="text-sm text-white/90">${e.location || e.am || '-'}</div>`;
-      return `
-        <div class="row-card p-4">
-          <div class="flex items-center">
-            <div class="flex-1 min-w-0">
-              <div class="font-semibold">${formatThai(e.date)}</div>
-              ${detail}
-            </div>
-            <button class="ml-4 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20"
-              onclick="openEdit('${e.rowId}', ${e.split?'true':'false'}, '${e.date}', '${escapeHTML(e.am||'')}', '${escapeHTML(e.pm||'')}', '${escapeHTML(e.location||'')}')">
-              แก้ไข
-            </button>
-          </div>
-          <div id="edit-${e.rowId}" class="hidden mt-4 pt-4 border-t border-white/10"></div>
-        </div>`; }
-
-    /* ===== Edit (Save / Cancel / Delete via delegation) ===== */
-    window.openEdit=function(rowId,split,date,am,pm,loc){
-      const box=document.getElementById(`edit-${rowId}`), isSplit=!!split;
-      box.innerHTML=`
-        <div class="space-y-3">
-          <div><label class="block text-sm font-semibold mb-1">วันที่</label><input type="date" id="ed-date-${rowId}" class="input" value="${date}" min="${today}"></div>
-          <div><label class="block text-sm font-semibold mb-1">ช่วงเวลา</label>
-            <div class="flex pill p-1">
-              <button type="button" id="ed-full-${rowId}"  class="flex-1 py-2 rounded-xl ${!isSplit?'bg-white/20':''}">เต็มวัน</button>
-              <button type="button" id="ed-split-${rowId}" class="flex-1 py-2 rounded-xl ${isSplit?'bg-white/20':''}">แยก AM/PM</button>
-            </div>
-          </div>
-          <div id="ed-fullBox-${rowId}" class="${isSplit?'hidden':''}">
-            <label class="block text-sm font-semibold mb-1">สถานที่ (ทั้งวัน)</label>
-            <input type="text" id="ed-fullLoc-${rowId}" class="input" value="${loc||am||''}">
-          </div>
-          <div id="ed-splitBox-${rowId}" class="${isSplit?'':'hidden'} space-y-3">
-            <div><label class="block text-sm font-semibold mb-1">🌅 AM</label><input type="text" id="ed-am-${rowId}" class="input" value="${am||''}"></div>
-            <div><label class="block text-sm font-semibold mb-1">🌆 PM</label><input type="text" id="ed-pm-${rowId}" class="input" value="${pm||''}"></div>
-          </div>
-          <div class="flex flex-col sm:flex-row gap-3 pt-2">
-            <button type="button" id="saveBtn-${rowId}"   class="btn flex-1 py-2">บันทึก</button>
-            <button type="button" id="cancelBtn-${rowId}" class="bg-white/10 hover:bg-white/20 flex-1 py-2 rounded-xl">ยกเลิก</button>
-            <!-- ปุ่มลบ ใช้ data-action + data-rowid เพื่อ delegation -->
-            <button type="button" class="flex-1 py-2 rounded-xl border border-red-400/40 bg-red-500/15 hover:bg-red-500/25"
-                    data-action="delete" data-rowid="${rowId}">ลบ</button>
-          </div>
-        </div>`;
-      box.classList.remove('hidden');
-
-      document.getElementById(`ed-full-${rowId}`).onclick=()=>toggleEditMode(rowId,false);
-      document.getElementById(`ed-split-${rowId}`).onclick=()=>toggleEditMode(rowId,true);
-      document.getElementById(`cancelBtn-${rowId}`).onclick=()=>closeEdit(rowId);
-      document.getElementById(`saveBtn-${rowId}`).onclick=async e=>{ e.preventDefault(); await saveEdit(rowId) };
-    };
-
-    // Delegation: จับคลิกปุ่มลบจาก container เดียว
-    document.getElementById('scheduleList').addEventListener('click', async (ev) => {
-      const btn = ev.target.closest('[data-action="delete"]');
-      if (!btn) return;
-      const rowId = btn.dataset.rowid;
-      console.log('delete clicked:', rowId);
-      if (!confirm('ต้องการลบรายการนี้ใช่หรือไม่?')) return;
-      try {
-        setBtnLoading(btn, true, 'ลบ', 'กำลังลบ...');
-        const { ok, error } = await callAPI('delete', { rowId });
-        setBtnLoading(btn, false, 'ลบ');
-        if (!ok) return toast(error || 'ลบไม่สำเร็จ', 'error');
-        toast('ลบเรียบร้อย');
-        const name = document.getElementById('viewName').value.trim();
-        if (name) await renderSchedule(name);
-      } catch (err) {
-        console.error('delete error:', err);
-        setBtnLoading(btn, false, 'ลบ');
-        toast('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'error');
+    function commonBulk(){
+      var name=(byId('nameSelect').value||'').replace(/^\s+|\s+$/g,'');
+      if(!name){ toast('กรุณาเลือกผู้ใช้งานก่อน','error'); return null; }
+      if(!splitMode){
+        var loc=(byId('fullLocation').value||'').replace(/^\s+|\s+$/g,'');
+        if(!loc){ toast('กรุณากรอกสถานที่ (เต็มวัน)','error'); return null; }
+        return {name:name, split:false, location:loc};
       }
+      var am=(byId('amLocation').value||'').replace(/^\s+|\s+$/g,'');
+      var pm=(byId('pmLocation').value||'').replace(/^\s+|\s+$/g,'');
+      if(!am||!pm){ toast('กรุณากรอกสถานที่ทั้ง AM และ PM','error'); return null; }
+      return {name:name, split:true, amLoc:am, pmLoc:pm};
+    }
+    var bulkThisWeekBtn=byId('bulkThisWeek'),
+        bulkNextWeekBtn=byId('bulkNextWeek'),
+        bulkRangeBtn=byId('bulkRange');
+
+    if(bulkThisWeekBtn) bulkThisWeekBtn.addEventListener('click', function(){
+      var base=commonBulk(); if(!base) return;
+      var we=getWeekRange(0);
+      var payload={}; for(var k in base){ payload[k]=base[k]; }
+      payload.startDate=we.start; payload.endDate=we.end; payload.weekdaysOnly=true;
+      setBtnLoading(bulkThisWeekBtn,true,'สร้าง จ–ศ สัปดาห์นี้','กำลังสร้าง...');
+      callAPI('bulkCreate', payload, function(r){
+        setBtnLoading(bulkThisWeekBtn,false,'สร้าง จ–ศ สัปดาห์นี้');
+        if(!r.ok) return toast(r.error||'บันทึกไม่สำเร็จ','error');
+        var msg='สร้างสำเร็จ: เพิ่ม '+r.created+' · อัปเดต '+r.updated+(r.skippedPast?(' · ข้ามย้อนหลัง '+r.skippedPast):'');
+        openPopup(msg);
+      });
     });
 
-    function toggleEditMode(id,toSplit){
-      const f=document.getElementById(`ed-full-${id}`), s=document.getElementById(`ed-split-${id}`), fb=document.getElementById(`ed-fullBox-${id}`), sb=document.getElementById(`ed-splitBox-${id}`);
-      if(toSplit){ s.classList.add('bg-white/20'); f.classList.remove('bg-white/20'); sb.classList.remove('hidden'); fb.classList.add('hidden'); }
-      else{ f.classList.add('bg-white/20'); s.classList.remove('bg-white/20'); fb.classList.remove('hidden'); sb.classList.add('hidden'); }
+    if(bulkNextWeekBtn) bulkNextWeekBtn.addEventListener('click', function(){
+      var base=commonBulk(); if(!base) return;
+      var we=getWeekRange(1);
+      var payload={}; for(var k in base){ payload[k]=base[k]; }
+      payload.startDate=we.start; payload.endDate=we.end; payload.weekdaysOnly=true;
+      setBtnLoading(bulkNextWeekBtn,true,'สร้าง จ–ศ สัปดาห์หน้า','กำลังสร้าง...');
+      callAPI('bulkCreate', payload, function(r){
+        setBtnLoading(bulkNextWeekBtn,false,'สร้าง จ–ศ สัปดาห์หน้า');
+        if(!r.ok) return toast(r.error||'บันทึกไม่สำเร็จ','error');
+        openPopup('สร้างสำเร็จ: เพิ่ม '+r.created+' · อัปเดต '+r.updated);
+      });
+    });
+
+    if(bulkRangeBtn) bulkRangeBtn.addEventListener('click', function(){
+      var base=commonBulk(); if(!base) return;
+      var s=byId('rangeStart').value, e=byId('rangeEnd').value;
+      if(!s||!e) return toast('กรุณาเลือกช่วงวันที่ให้ครบ','error');
+      if(e<s)    return toast('วันสิ้นสุดต้องมากกว่าหรือเท่ากับวันเริ่ม','error');
+      var payload={}; for(var k in base){ payload[k]=base[k]; }
+      payload.startDate=s; payload.endDate=e; payload.weekdaysOnly=false;
+      setBtnLoading(bulkRangeBtn,true,'บันทึกแบบช่วงวันที่','กำลังสร้าง...');
+      callAPI('bulkCreate', payload, function(r){
+        setBtnLoading(bulkRangeBtn,false,'บันทึกแบบช่วงวันที่');
+        if(!r.ok) return toast(r.error||'บันทึกไม่สำเร็จ','error');
+        openPopup('สร้างสำเร็จ: เพิ่ม '+r.created+' · อัปเดต '+r.updated);
+      });
+    });
+
+    /* ===== Future schedule (Tab2) ===== */
+    function formatThai(iso){ var d=new Date(iso); var m=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.']; return d.getDate()+' '+m[d.getMonth()]+' '+(d.getFullYear()+543); }
+    function renderItem(e){
+      var detail = e.split ? '<div class="text-sm text-white/90">🌅 AM: '+(e.am||'-')+'</div><div class="text-sm text-white/90">🌆 PM: '+(e.pm||'-')+'</div>' : '<div class="text-sm text-white/90">'+(e.location || e.am || '-')+'</div>';
+      return '<div class="row-card p-4"><div class="flex items-center"><div class="flex-1 min-w-0"><div class="font-semibold">'+formatThai(e.date)+'</div>'+detail+'</div><button type="button" class="ml-4 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 edit-btn" data-rowid="'+e.rowId+'" data-split="'+(e.split?'1':'0')+'" data-date="'+e.date+'" data-am="'+escapeHTML(e.am||'')+'" data-pm="'+escapeHTML(e.pm||'')+'" data-loc="'+escapeHTML(e.location||'')+'">แก้ไข</button></div><div id="edit-'+e.rowId+'" class="hidden mt-4 pt-4 border-t border-white/10"></div></div>';
     }
-    function closeEdit(id){ document.getElementById(`edit-${id}`).classList.add('hidden'); }
+    function renderSchedule(name){
+      var wrap=byId('scheduleWrap'), list=byId('scheduleList');
+      if(wrap) removeClass(wrap,'hidden');
+      if(list) list.innerHTML='<div class="text-white/80">กำลังโหลด...</div>';
+      callAPI('listFuture',{name:name,from:today}, function(r){
+        if(!byId('scheduleList')) return;
+        if(!r.ok){ byId('scheduleList').innerHTML='<div class="text-red-300">'+(r.error||'โหลดไม่สำเร็จ')+'</div>'; return; }
+        var items=r.items||[];
+        if(!items.length){ byId('scheduleList').innerHTML='<div class="text-white/80">ไม่มีตารางงานในอนาคต</div>'; return; }
+        var html=''; for(var i=0;i<items.length;i++){ html+=renderItem(items[i]); }
+        byId('scheduleList').innerHTML=html;
+      });
+    }
+    var viewBtn=byId('viewBtn');
+    if(viewBtn){ viewBtn.addEventListener('click', function(){ var name=(byId('viewName').value||'').replace(/^\s+|\s+$/g,''); if(!name) return toast('กรุณาเลือกชื่อผู้ใช้','error'); setBtnLoading(viewBtn,true,'ดูตาราง','กำลังโหลด...'); renderSchedule(name); setTimeout(function(){ setBtnLoading(viewBtn,false,'ดูตาราง'); }, 400); }); }
 
-    async function saveEdit(rowId){
-      const date=document.getElementById(`ed-date-${rowId}`).value; if(!date) return toast('กรุณาเลือกวันที่','error'); if(date<today) return toast('ไม่สามารถตั้งย้อนหลังได้','error');
-      const isFull=!document.getElementById(`ed-fullBox-${rowId}`).classList.contains('hidden'); const btn=document.getElementById(`saveBtn-${rowId}`);
-      let payload={rowId,date};
-      if(isFull){ const loc=document.getElementById(`ed-fullLoc-${rowId}`).value.trim(); if(!loc) return toast('กรุณากรอกสถานที่ (เต็มวัน)','error'); payload.split=false; payload.location=loc; }
-      else{ const am=document.getElementById(`ed-am-${rowId}`).value.trim(), pm=document.getElementById(`ed-pm-${rowId}`).value.trim(); if(!am||!pm) return toast('กรุณากรอกสถานที่ทั้ง AM และ PM','error'); payload.split=true; payload.amLoc=am; payload.pmLoc=pm; }
-      try{ setBtnLoading(btn,true,'บันทึก','กำลังบันทึก...'); const {ok,error}=await callAPI('update',payload); if(!ok) return toast(error||'แก้ไขไม่สำเร็จ','error'); openPopup('แก้ไขข้อมูลเรียบร้อยแล้ว'); const name=document.getElementById('viewName').value.trim(); if(name) renderSchedule(name); }
-      finally{ setBtnLoading(btn,false,'บันทึก') }
+    // delegation: edit/toggle/delete/save/cancel
+    var scheduleList = byId('scheduleList');
+    if(scheduleList){
+      scheduleList.addEventListener('click', function(ev){
+        var btn = ev.target.closest ? ev.target.closest('.edit-btn,[data-action="delete"],[data-action="save"],[data-action="cancel"],[data-action="toggle-full"],[data-action="toggle-split"]') : null;
+        if(!btn) return;
+
+        if(btn.classList.contains('edit-btn')){
+          var rowId=btn.getAttribute('data-rowid');
+          var isSplit=btn.getAttribute('data-split')==='1';
+          var date=btn.getAttribute('data-date');
+          var am=btn.getAttribute('data-am')||'';
+          var pm=btn.getAttribute('data-pm')||'';
+          var loc=btn.getAttribute('data-loc')||'';
+          var box=byId('edit-'+rowId);
+          if(!box) return;
+
+          box.innerHTML=
+            '<div class="space-y-3">'+
+              '<div><label class="block text-sm font-semibold mb-1">วันที่</label><input type="date" id="ed-date-'+rowId+'" class="input" value="'+date+'" min="'+today+'"></div>'+
+              '<div><label class="block text-sm font-semibold mb-1">ช่วงเวลา</label>'+
+                '<div class="flex pill p-1">'+
+                  '<button type="button" id="ed-full-'+rowId+'"  class="flex-1 py-2 rounded-xl '+(!isSplit?'bg-white/20':'')+'" data-action="toggle-full" data-id="'+rowId+'">เต็มวัน</button>'+
+                  '<button type="button" id="ed-split-'+rowId+'" class="flex-1 py-2 rounded-xl '+(isSplit?'bg-white/20':'')+'" data-action="toggle-split" data-id="'+rowId+'">แยก AM/PM</button>'+
+                '</div>'+
+              '</div>'+
+              '<div id="ed-fullBox-'+rowId+'" class="'+(isSplit?'hidden':'')+'">'+
+                '<label class="block text-sm font-semibold mb-1">สถานที่ (ทั้งวัน)</label>'+
+                '<input type="text" id="ed-fullLoc-'+rowId+'" class="input" value="'+(loc||am)+'">'+
+              '</div>'+
+              '<div id="ed-splitBox-'+rowId+'" class="'+(isSplit?'':'hidden')+' space-y-3">'+
+                '<div><label class="block text-sm font-semibold mb-1">🌅 AM</label><input type="text" id="ed-am-'+rowId+'" class="input" value="'+am+'"></div>'+
+                '<div><label class="block text-sm font-semibold mb-1">🌆 PM</label><input type="text" id="ed-pm-'+rowId+'" class="input" value="'+pm+'"></div>'+
+              '</div>'+
+              '<div class="flex flex-col sm:flex-row gap-3 pt-2">'+
+                '<button type="button" class="btn flex-1 py-2" data-action="save" data-id="'+rowId+'">บันทึก</button>'+
+                '<button type="button" class="bg-white/10 hover:bg-white/20 flex-1 py-2 rounded-xl" data-action="cancel" data-id="'+rowId+'">ยกเลิก</button>'+
+                '<button type="button" class="flex-1 py-2 rounded-xl border border-red-400/40 bg-red-500/15 hover:bg-red-500/25" data-action="delete" data-rowid="'+rowId+'">ลบ</button>'+
+              '</div>'+
+            '</div>';
+          removeClass(box,'hidden');
+          return;
+        }
+
+        var action = btn.getAttribute('data-action');
+        if(!action) return;
+
+        if(action==='toggle-full' || action==='toggle-split'){
+          var id = btn.getAttribute('data-id');
+          var fullB=byId('ed-full-'+id), splitB=byId('ed-split-'+id);
+          var fb=byId('ed-fullBox-'+id), sb=byId('ed-splitBox-'+id);
+          var toSplit = (action==='toggle-split');
+          if(toSplit){ if(splitB) addClass(splitB,'bg-white/20'); if(fullB) removeClass(fullB,'bg-white/20'); if(sb) removeClass(sb,'hidden'); if(fb) addClass(fb,'hidden'); }
+          else{ if(fullB) addClass(fullB,'bg-white/20'); if(splitB) removeClass(splitB,'bg-white/20'); if(fb) removeClass(fb,'hidden'); if(sb) addClass(sb,'hidden'); }
+          return;
+        }
+
+        if(action==='cancel'){ var idc=btn.getAttribute('data-id'); var box2=byId('edit-'+idc); if(box2) addClass(box2,'hidden'); return; }
+
+        if(action==='delete'){
+          var rowIdDel=btn.getAttribute('data-rowid');
+          if(!confirm('ต้องการลบรายการนี้ใช่หรือไม่?')) return;
+          setBtnLoading(btn,true,'ลบ','กำลังลบ...');
+          callAPI('delete',{rowId:rowIdDel}, function(r){
+            setBtnLoading(btn,false,'ลบ');
+            if(!r.ok) return toast(r.error||'ลบไม่สำเร็จ','error');
+            toast('ลบเรียบร้อย');
+            var name=(byId('viewName')&&byId('viewName').value)||''; if(name) renderSchedule(name);
+          });
+          return;
+        }
+
+        if(action==='save'){
+          var idS=btn.getAttribute('data-id');
+          var dateS=byId('ed-date-'+idS).value;
+          if(!dateS) return toast('กรุณาเลือกวันที่','error');
+          if(dateS<today) return toast('ไม่สามารถตั้งย้อนหลังได้','error');
+          var isFull = !byId('ed-fullBox-'+idS).classList.contains('hidden');
+          var payload={rowId:idS, date:dateS};
+          if(isFull){
+            var loc2=(byId('ed-fullLoc-'+idS).value||'').replace(/^\s+|\s+$/g,'');
+            if(!loc2) return toast('กรุณากรอกสถานที่ (เต็มวัน)','error');
+            payload.split=false; payload.location=loc2;
+          }else{
+            var am2=(byId('ed-am-'+idS).value||'').replace(/^\s+|\s+$/g,'');
+            var pm2=(byId('ed-pm-'+idS).value||'').replace(/^\s+|\s+$/g,'');
+            if(!am2||!pm2) return toast('กรุณากรอกสถานที่ทั้ง AM และ PM','error');
+            payload.split=true; payload.amLoc=am2; payload.pmLoc=pm2;
+          }
+          setBtnLoading(btn,true,'บันทึก','กำลังบันทึก...');
+          callAPI('update',payload,function(r){
+            setBtnLoading(btn,false,'บันทึก');
+            if(!r.ok) return toast(r.error||'แก้ไขไม่สำเร็จ','error');
+            openPopup('แก้ไขข้อมูลเรียบร้อยแล้ว');
+            var name2=(byId('viewName')&&byId('viewName').value)||''; if(name2) renderSchedule(name2);
+          });
+          return;
+        }
+      });
     }
 
-    /* ===== Scheduler UI ===== */
-    const weekdayWrap=document.getElementById('weekdayWrap'), labels=['อา','จ','อ','พ','พฤ','ศ','ส'];
-    const dayButtons=[]; (function(){ for(let i=0;i<7;i++){ const b=document.createElement('button'); b.type='button'; b.className='px-2 py-2 rounded-lg bg-white/10 hover:bg-white/20'; b.textContent=labels[i]; b.dataset.active=(i>=1&&i<=5)?'1':'0'; toggleDay(b); b.addEventListener('click',()=>{b.dataset.active=b.dataset.active==='1'?'0':'1'; toggleDay(b)}); weekdayWrap.appendChild(b); dayButtons.push(b); } })();
-    function toggleDay(b){ if(b.dataset.active==='1'){ b.classList.add('bg-emerald-500/20','border','border-emerald-400/40') } else { b.classList.remove('bg-emerald-500/20','border','border-emerald-400/40') } }
-    const isoToJs=d=>(d%7), jsToIso=i=>(i===0?7:i);
-
-    async function loadSchedule(){ const {ok,config,error}=await callAPI('getSchedule',{}); if(!ok) return document.getElementById('schedStatus').textContent=error||'โหลดตารางส่งไม่สำเร็จ';
-      document.getElementById('schedEnabled').checked=!!config.enabled; document.getElementById('schedTime').value=config.time||'08:30'; document.getElementById('schedSkipHolidays').checked=!!config.skipHolidays;
-      dayButtons.forEach(b=>{ b.dataset.active='0'; toggleDay(b) }); (config.days||[1,2,3,4,5]).forEach(d=>{ const idx=isoToJs(d); dayButtons[idx].dataset.active='1'; toggleDay(dayButtons[idx]) });
-      document.getElementById('schedStatus').textContent=config.enabled?`จะส่งอัตโนมัติทุกวันเวลา ${config.time} (วัน: ${config.days.join(',')})`:'ปิดการส่งอัตโนมัติอยู่';
+    /* ===== Scheduler ===== */
+    var weekdayWrap=byId('weekdayWrap'), labels=['อา','จ','อ','พ','พฤ','ศ','ส']; var dayButtons=[];
+    if(weekdayWrap){
+      for(var di=0;di<7;di++){
+        var b=document.createElement('button'); b.type='button'; b.className='px-2 py-2 rounded-lg bg-white/10 hover:bg-white/20 min-h-[42px]'; b.textContent=labels[di]; b.setAttribute('data-active', (di>=1&&di<=5)?'1':'0'); toggleDay(b);
+        b.addEventListener('click', (function(bb){ return function(){ bb.setAttribute('data-active', bb.getAttribute('data-active')==='1'?'0':'1'); toggleDay(bb); }; })(b));
+        weekdayWrap.appendChild(b); dayButtons.push(b);
+      }
     }
-    loadSchedule(); document.getElementById('reloadSchedBtn').addEventListener('click',loadSchedule);
+    function toggleDay(b){ if(b.getAttribute('data-active')==='1'){ b.classList.add('bg-emerald-500/20','border','border-emerald-400/40'); }else{ b.classList.remove('bg-emerald-500/20','border','border-emerald-400/40'); } }
+    function isoToJs(d){ return (d%7); } function jsToIso(i){ return (i===0?7:i); }
 
-    document.getElementById('saveSchedBtn').addEventListener('click',async()=>{ const btn=document.getElementById('saveSchedBtn');
-      const enabled=document.getElementById('schedEnabled').checked, time=document.getElementById('schedTime').value, skipHolidays=document.getElementById('schedSkipHolidays').checked;
-      const days=dayButtons.map((b,i)=>b.dataset.active==='1'?jsToIso(i):null).filter(Boolean); if(!/^\d{2}:\d{2}$/.test(time)) return toast('รูปแบบเวลาไม่ถูกต้อง (HH:mm)','error'); if(enabled && days.length===0) return toast('กรุณาเลือกอย่างน้อย 1 วัน','error');
-      try{ setBtnLoading(btn,true,'บันทึกตารางส่ง','กำลังบันทึก...'); const r=await callAPI('saveSchedule',{enabled,time,days,skipHolidays}); if(!r.ok) return toast(r.error||'บันทึกไม่สำเร็จ','error'); toast('บันทึกตารางส่งเรียบร้อย'); loadSchedule(); }
-      finally{ setBtnLoading(btn,false,'บันทึกตารางส่ง') } });
+    function loadSchedule(){
+      callAPI('getSchedule',{}, function(r){
+        if(!r.ok){ var st=byId('schedStatus'); if(st) st.textContent=r.error||'โหลดตารางส่งไม่สำเร็จ'; return; }
+        var cfg=r.config||{}; var en=byId('schedEnabled'); if(en) en.checked=!!cfg.enabled; var tm=byId('schedTime'); if(tm) tm.value=cfg.time||'08:30'; var sk=byId('schedSkipHolidays'); if(sk) sk.checked=!!cfg.skipHolidays;
+        for(var i=0;i<dayButtons.length;i++){ dayButtons[i].setAttribute('data-active','0'); toggleDay(dayButtons[i]); }
+        var days=cfg.days||[1,2,3,4,5]; for(var j=0;j<days.length;j++){ var idx=isoToJs(days[j]); if(dayButtons[idx]){ dayButtons[idx].setAttribute('data-active','1'); toggleDay(dayButtons[idx]); } }
+        var stEl=byId('schedStatus'); if(stEl) stEl.textContent = cfg.enabled ? ('จะส่งอัตโนมัติทุกวันเวลา '+(cfg.time||'')+' (วัน: '+days.join(',')+')') : 'ปิดการส่งอัตโนมัติอยู่';
+      });
+    }
+    loadSchedule();
+    var reloadBtn=byId('reloadSchedBtn'); if(reloadBtn){ reloadBtn.addEventListener('click', loadSchedule); }
 
-    /* ===== Send now ===== */
-    document.getElementById('sendNowBtn').addEventListener('click',async()=>{ const btn=document.getElementById('sendNowBtn'); const date=sendDateInput.value; if(!date) return toast('กรุณาเลือกวันที่ก่อน','error');
-      try{ setBtnLoading(btn,true,'ส่งเข้าไลน์เดี๋ยวนี้','กำลังส่ง...'); const r=await callAPI('pushNow',{date}); if(!r.ok) return toast(r.error||'ส่งไม่สำเร็จ','error'); openPopup('ส่งเข้าไลน์เรียบร้อย'); }
-      finally{ setBtnLoading(btn,false,'ส่งเข้าไลน์เดี๋ยวนี้') } });
+    var saveSchedBtn=byId('saveSchedBtn');
+    if(saveSchedBtn){
+      saveSchedBtn.addEventListener('click', function(){
+        var enabled=byId('schedEnabled').checked; var time=byId('schedTime').value; var skipHolidays=byId('schedSkipHolidays').checked;
+        var days=[], i; for(i=0;i<dayButtons.length;i++){ if(dayButtons[i].getAttribute('data-active')==='1'){ days.push(jsToIso(i)); } }
+        if(!/^\d{2}:\d{2}$/.test(time)) return toast('รูปแบบเวลาไม่ถูกต้อง (HH:mm)','error');
+        if(enabled && !days.length) return toast('กรุณาเลือกอย่างน้อย 1 วัน','error');
+        setBtnLoading(saveSchedBtn,true,'บันทึกตารางส่ง','กำลังบันทึก...');
+        callAPI('saveSchedule',{enabled:enabled,time:time,days:days,skipHolidays:skipHolidays}, function(r){
+          setBtnLoading(saveSchedBtn,false,'บันทึกตารางส่ง'); if(!r.ok) return toast(r.error||'บันทึกไม่สำเร็จ','error'); toast('บันทึกตารางส่งเรียบร้อย'); loadSchedule();
+        });
+      });
+    }
+
+    var sendNowBtn=byId('sendNowBtn');
+    if(sendNowBtn){
+      sendNowBtn.addEventListener('click', function(){
+        var date=byId('sendDateInput').value; if(!date) return toast('กรุณาเลือกวันที่ก่อน','error');
+        setBtnLoading(sendNowBtn,true,'ส่งเข้าไลน์เดี๋ยวนี้','กำลังส่ง...');
+        callAPI('pushNow',{date:date}, function(r){
+          setBtnLoading(sendNowBtn,false,'ส่งเข้าไลน์เดี๋ยวนี้'); if(!r.ok) return toast(r.error||'ส่งไม่สำเร็จ','error'); openPopup('ส่งเข้าไลน์เรียบร้อย');
+        });
+      });
+    }
+
+    /* ===== Build & Copy preview message (Tab3) ===== */
+    var TEAM_NAME = 'Fin-ed';
+    var previewDate = byId('previewDate');
+    var buildPreviewBtn = byId('buildPreviewBtn');
+    var copyPreviewBtn = byId('copyPreviewBtn');
+    var previewBox = byId('previewBox');
+    var previewHint = byId('previewHint');
+    var previewLoader = byId('previewLoader');
+
+    if(previewDate){ previewDate.min = today; previewDate.value = today; }
+
+    function thaiLongDate(iso){
+      var d=new Date(iso);
+      var months=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+      return d.getDate()+' '+months[d.getMonth()]+' '+(d.getFullYear()+543);
+    }
+
+    function buildMessageFromRows(items, iso) {
+      var map = {};
+      function add(loc, name){
+        if(!loc) return;
+        if(!map[loc]) map[loc]=[];
+        map[loc].push(name);
+      }
+      for(var i=0;i<items.length;i++){
+        var row = items[i];
+        var name = row.name || '';
+        if(!name) continue;
+        if(row.split){
+          if(row.am) add(row.am, name + '(AM)');
+          if(row.pm) add(row.pm, name + '(PM)');
+        }else{
+          var loc = row.location || row.am || '';
+          if(loc) add(loc, name);
+        }
+      }
+      var locs = Object.keys(map).sort(function(a,b){ return a.localeCompare(b,'th'); });
+      var lines = [];
+      for(var j=0;j<locs.length;j++){
+        var loc = locs[j];
+        var names = map[loc] || [];
+        if(names.length) lines.push(loc + ' ('+names.length+') : ' + names.join(' '));
+      }
+      if(!lines.length) return '';
+      var header = TEAM_NAME + ' วันที่ ' + thaiLongDate(iso);
+      return [header].concat(lines).join('\n');
+    }
+
+    function setPreviewLoading(state){
+      if(state){
+        show(previewLoader);
+        buildPreviewBtn && (buildPreviewBtn.disabled = true);
+        copyPreviewBtn && (copyPreviewBtn.disabled = true);
+        previewBox && (previewBox.value = '');
+        previewHint && text(previewHint,'กำลังสร้างข้อความ…');
+      }else{
+        hide(previewLoader);
+        buildPreviewBtn && (buildPreviewBtn.disabled = false);
+        copyPreviewBtn && (copyPreviewBtn.disabled = false);
+      }
+    }
+
+    function buildPreview(){
+      var iso = previewDate ? previewDate.value : today;
+      if(!iso){ toast('กรุณาเลือกวันที่','error'); return; }
+      setPreviewLoading(true);
+      callAPI('listFuture', { from: iso, to: iso }, function(r){
+        setPreviewLoading(false);
+        if(!r.ok){ previewBox.value=''; text(previewHint, r.error || 'ไม่สามารถสร้างข้อความได้'); return; }
+        var items = r.items || [];
+        var msg = buildMessageFromRows(items, iso);
+        if(!msg){
+          previewBox.value = '';
+          text(previewHint, 'ไม่มีข้อมูล check-in สำหรับวันที่เลือก');
+        }else{
+          previewBox.value = msg;
+          text(previewHint, 'สร้างสำเร็จ คุณสามารถกด “คัดลอก” แล้วนำไปวางในไลน์ได้เลย');
+        }
+      });
+    }
+
+    function copyPreview(){
+      var t = (previewBox && previewBox.value) ? previewBox.value : '';
+      if(!t){ toast('ยังไม่มีข้อความให้คัดลอก','error'); return; }
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(t).then(function(){ toast('คัดลอกแล้ว'); })
+          .catch(function(){ fallbackCopy(); });
+      } else { fallbackCopy(); }
+      function fallbackCopy(){
+        try{
+          previewBox.removeAttribute('readonly');
+          previewBox.select(); document.execCommand('copy');
+          previewBox.setAttribute('readonly','');
+          toast('คัดลอกแล้ว');
+        }catch(_){ toast('คัดลอกไม่สำเร็จ','error'); }
+      }
+    }
+
+    if(buildPreviewBtn){ buildPreviewBtn.addEventListener('click', buildPreview); }
+    if(copyPreviewBtn){ copyPreviewBtn.addEventListener('click', copyPreview); }
+  })();
   </script>
 </body>
 </html>
